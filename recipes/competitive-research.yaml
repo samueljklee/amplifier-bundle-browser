@@ -2,21 +2,16 @@ name: competitive-research
 description: |
   Research competitors by visiting their websites and extracting key information.
   Produces a structured comparison report.
+version: "1.0.0"
 
 # Usage:
 #   amplifier tool invoke recipes operation=execute \
 #     recipe_path=@browser:recipes/competitive-research.yaml \
 #     context='{"competitors": ["stripe.com", "square.com"], "research_focus": "pricing and features"}'
 
-inputs:
-  competitors:
-    description: List of competitor domains to research
-    type: array
-    required: true
-  research_focus:
-    description: What aspects to focus on (e.g., "pricing", "features", "integrations")
-    type: string
-    default: "pricing, features, and target audience"
+context:
+  competitors: []   # Required: List of competitor domains to research
+  research_focus: "pricing, features, and target audience"  # What aspects to focus on
 
 steps:
   - id: research
@@ -40,13 +35,14 @@ steps:
       - Unique differentiators
       
       Always close the browser between competitors to keep sessions clean.
+    output: research_findings
 
   - id: synthesize
     agent: foundation:zen-architect
     prompt: |
       Based on the competitive research:
       
-      {{steps.research.result}}
+      {{research_findings}}
       
       Create a competitive analysis report with:
       
@@ -65,9 +61,4 @@ steps:
       
       ## Recommendations
       [Actionable insights]
-
-output:
-  format: markdown
-  include:
-    - steps.research.result
-    - steps.synthesize.result
+    output: analysis_report

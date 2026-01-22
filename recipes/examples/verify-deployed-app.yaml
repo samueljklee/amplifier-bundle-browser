@@ -9,29 +9,18 @@ description: |
   - Dynamic content loads after page render
   
   This recipe logs into your app, navigates key pages, and reports any issues.
+version: "1.0.0"
 
 # Usage:
 #   amplifier tool invoke recipes operation=execute \
 #     recipe_path=@browser:recipes/examples/verify-deployed-app.yaml \
 #     context='{"app_url": "https://staging.myapp.com", "login_email": "test@example.com", "login_password": "testpass123"}'
 
-inputs:
-  app_url:
-    description: Base URL of the deployed application
-    type: string
-    required: true
-  login_email:
-    description: Email/username for authentication
-    type: string
-    required: false
-  login_password:
-    description: Password for authentication
-    type: string
-    required: false
-  pages_to_check:
-    description: List of paths to verify after login
-    type: array
-    default: ["/dashboard", "/settings"]
+context:
+  app_url: ""                    # Required: Base URL of the deployed application
+  login_email: ""                # Optional: Email/username for authentication
+  login_password: ""             # Optional: Password for authentication
+  pages_to_check: ["/dashboard", "/settings"]  # List of paths to verify after login
 
 steps:
   - id: verify
@@ -77,8 +66,4 @@ steps:
       - Specific elements that look wrong
       
       Close the browser when complete.
-
-output:
-  format: markdown
-  include:
-    - steps.verify.result
+    output: verification_result

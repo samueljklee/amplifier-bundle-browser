@@ -2,25 +2,17 @@ name: visual-audit
 description: |
   Capture screenshots of a website across multiple pages for visual documentation,
   QA review, or change tracking.
+version: "1.0.0"
 
 # Usage:
 #   amplifier tool invoke recipes operation=execute \
 #     recipe_path=@browser:recipes/visual-audit.yaml \
 #     context='{"base_url": "https://example.com", "pages": ["/", "/pricing", "/features"]}'
 
-inputs:
-  base_url:
-    description: Base URL of the website to audit
-    type: string
-    required: true
-  pages:
-    description: List of page paths to capture (relative to base_url)
-    type: array
-    default: ["/"]
-  output_dir:
-    description: Directory to save screenshots
-    type: string
-    default: "./screenshots"
+context:
+  base_url: ""              # Required: Base URL of the website to audit
+  pages: ["/"]              # List of page paths to capture (relative to base_url)
+  output_dir: "./screenshots"  # Directory to save screenshots
 
 steps:
   - id: capture
@@ -43,13 +35,14 @@ steps:
       - Report any visual inconsistencies observed
       
       Close the browser when complete.
+    output: capture_results
 
   - id: report
     agent: foundation:explorer
     prompt: |
       Based on the visual audit results:
       
-      {{steps.capture.result}}
+      {{capture_results}}
       
       Create a visual audit report:
       
@@ -66,9 +59,4 @@ steps:
       
       ## Next Steps
       [What to do with these screenshots]
-
-output:
-  format: markdown
-  include:
-    - steps.capture.result
-    - steps.report.result
+    output: audit_report

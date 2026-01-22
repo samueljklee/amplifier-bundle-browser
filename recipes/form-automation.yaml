@@ -2,33 +2,19 @@ name: form-automation
 description: |
   Automate filling out a web form with provided data.
   Useful for testing, data entry, or repetitive form submissions.
+version: "1.0.0"
 
 # Usage:
 #   amplifier tool invoke recipes operation=execute \
 #     recipe_path=@browser:recipes/form-automation.yaml \
 #     context='{"form_url": "https://example.com/contact", "form_data": {"name": "John", "email": "john@test.com"}}'
 
-inputs:
-  form_url:
-    description: URL of the page containing the form
-    type: string
-    required: true
-  form_data:
-    description: Key-value pairs of form fields and values
-    type: object
-    required: true
-  submit:
-    description: Whether to submit the form after filling
-    type: boolean
-    default: false
-  screenshot_before:
-    description: Take screenshot before filling
-    type: boolean
-    default: true
-  screenshot_after:
-    description: Take screenshot after filling (before submit)
-    type: boolean
-    default: true
+context:
+  form_url: ""              # Required: URL of the page containing the form
+  form_data: {}             # Required: Key-value pairs of form fields and values
+  submit: false             # Whether to submit the form after filling
+  screenshot_before: true   # Take screenshot before filling
+  screenshot_after: true    # Take screenshot after filling (before submit)
 
 steps:
   - id: fill-form
@@ -68,8 +54,4 @@ steps:
       - Screenshots taken
       
       Close the browser when complete.
-
-output:
-  format: markdown
-  include:
-    - steps.fill-form.result
+    output: form_result

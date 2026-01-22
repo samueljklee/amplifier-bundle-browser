@@ -8,21 +8,16 @@ description: |
   - Some sites block automated requests (bot detection)
   - Prices may be dynamically loaded or region-specific
   - Need visual context to understand pricing structure
+version: "1.0.0"
 
 # Usage:
 #   amplifier tool invoke recipes operation=execute \
 #     recipe_path=@browser:recipes/examples/monitor-competitor-pricing.yaml \
 #     context='{"pricing_url": "https://competitor.com/pricing"}'
 
-inputs:
-  pricing_url:
-    description: URL of the competitor's pricing page
-    type: string
-    required: true
-  compare_to:
-    description: Optional - your product's pricing to compare against
-    type: object
-    default: {}
+context:
+  pricing_url: ""   # Required: URL of the competitor's pricing page
+  compare_to: {}    # Optional: Your product's pricing to compare against
 
 steps:
   - id: capture-pricing
@@ -73,8 +68,4 @@ steps:
       {% endif %}
       
       Close the browser when complete.
-
-output:
-  format: markdown
-  include:
-    - steps.capture-pricing.result
+    output: pricing_data

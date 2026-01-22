@@ -4,12 +4,13 @@ description: |
   Fetches live content from Hacker News that requires seeing the rendered page.
   
   Run this first to see the browser bundle working!
+version: "1.0.0"
 
 # Usage:
 #   amplifier tool invoke recipes operation=execute \
 #     recipe_path=@browser:recipes/examples/quick-demo.yaml
 
-inputs: {}
+context: {}
 
 steps:
   - id: demo
@@ -56,8 +57,4 @@ steps:
       *Captured live at [timestamp]*
       
       Close the browser when complete.
-
-output:
-  format: markdown
-  include:
-    - steps.demo.result
+    output: demo_result

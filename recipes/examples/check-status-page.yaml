@@ -9,21 +9,16 @@ description: |
   - Incident details may be dynamically loaded
   
   Try: curl https://status.vercel.com - you'll get a JS shell, not the actual status.
+version: "1.0.0"
 
 # Usage:
 #   amplifier tool invoke recipes operation=execute \
 #     recipe_path=@browser:recipes/examples/check-status-page.yaml \
 #     context='{"status_url": "https://status.openai.com"}'
 
-inputs:
-  status_url:
-    description: URL of the status page to check
-    type: string
-    required: true
-  services:
-    description: Specific services to check (optional, checks all if empty)
-    type: array
-    default: []
+context:
+  status_url: ""   # Required: URL of the status page to check
+  services: []     # Optional: Specific services to check (checks all if empty)
 
 steps:
   - id: check-status
@@ -72,8 +67,4 @@ steps:
       [Any upcoming maintenance windows]
       
       Close the browser when complete.
-
-output:
-  format: markdown
-  include:
-    - steps.check-status.result
+    output: status_result
