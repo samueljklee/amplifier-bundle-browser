@@ -8,6 +8,10 @@ bundle:
 includes:
   - bundle: git+https://github.com/microsoft/amplifier-foundation@main
   - bundle: browser:behaviors/browser.yaml
+
+skills:
+  dirs:
+    - git+https://github.com/robotdad/skills@main#subdirectory=image-vision
 ---
 
 # Browser Bundle
