@@ -1,0 +1,46 @@
+bundle:
+  name: browser-behavior
+  version: 0.2.0
+  description: |
+    Browser automation behavior - adds browser agents for web interaction,
+    research, and visual documentation. Can be composed into any bundle.
+
+# Register browser agents
+agents:
+  browser-operator:
+    description: |
+      General-purpose browser automation. Handles navigation, form filling,
+      data extraction, and screenshots. Accepts natural language instructions.
+      
+      Examples:
+      - "Go to github.com and find the trending repositories"
+      - "Fill the contact form with name=John, email=john@test.com"
+      - "Take a screenshot of the landing page"
+    instructions: browser:agents/browser-operator.md
+
+  web-researcher:
+    description: |
+      Research-focused browser agent for finding and extracting information.
+      Optimized for multi-page exploration and data synthesis.
+      
+      Examples:
+      - "Research the pricing of top 3 competitors in the CRM space"
+      - "Find the API rate limits from Stripe's documentation"
+      - "What are the system requirements for installing Docker?"
+    instructions: browser:agents/web-researcher.md
+
+  visual-documenter:
+    description: |
+      Screenshot and visual documentation agent. Creates visual records of
+      websites, UI states, and workflows. Perfect for QA and change tracking.
+      
+      Examples:
+      - "Screenshot our landing page at different viewport sizes"
+      - "Document the checkout flow step by step"
+      - "Create before/after screenshots of the homepage"
+    instructions: browser:agents/visual-documenter.md
+
+# Inject browser instructions into context
+context:
+  include:
+    - browser:context/browser-instructions.md

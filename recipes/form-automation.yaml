@@ -1,0 +1,75 @@
+name: form-automation
+description: |
+  Automate filling out a web form with provided data.
+  Useful for testing, data entry, or repetitive form submissions.
+
+# Usage:
+#   amplifier tool invoke recipes operation=execute \
+#     recipe_path=@browser:recipes/form-automation.yaml \
+#     context='{"form_url": "https://example.com/contact", "form_data": {"name": "John", "email": "john@test.com"}}'
+
+inputs:
+  form_url:
+    description: URL of the page containing the form
+    type: string
+    required: true
+  form_data:
+    description: Key-value pairs of form fields and values
+    type: object
+    required: true
+  submit:
+    description: Whether to submit the form after filling
+    type: boolean
+    default: false
+  screenshot_before:
+    description: Take screenshot before filling
+    type: boolean
+    default: true
+  screenshot_after:
+    description: Take screenshot after filling (before submit)
+    type: boolean
+    default: true
+
+steps:
+  - id: fill-form
+    agent: browser:browser-operator
+    prompt: |
+      Navigate to: {{form_url}}
+      
+      {% if screenshot_before %}
+      Take a screenshot: form-before.png
+      {% endif %}
+      
+      Get a snapshot of the page to identify form fields.
+      
+      Fill in the following form data:
+      {% for key, value in form_data.items() %}
+      - {{key}}: {{value}}
+      {% endfor %}
+      
+      For each field:
+      1. Find the input element (look for labels, placeholders, or field names)
+      2. Use the appropriate command (fill for text, select for dropdowns, check for checkboxes)
+      
+      {% if screenshot_after %}
+      Take a screenshot after filling: form-filled.png
+      {% endif %}
+      
+      {% if submit %}
+      Find and click the submit button.
+      Wait for response and take a screenshot: form-submitted.png
+      {% else %}
+      Do NOT submit the form - just fill it out.
+      {% endif %}
+      
+      Report:
+      - Which fields were filled successfully
+      - Any fields that couldn't be found
+      - Screenshots taken
+      
+      Close the browser when complete.
+
+output:
+  format: markdown
+  include:
+    - steps.fill-form.result
