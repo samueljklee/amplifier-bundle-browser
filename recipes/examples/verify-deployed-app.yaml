@@ -24,7 +24,7 @@ context:
 
 steps:
   - id: verify
-    agent: browser:browser-operator
+    agent: foundation:explorer
     prompt: |
       Verify the deployed application at {{app_url}} is working correctly.
       

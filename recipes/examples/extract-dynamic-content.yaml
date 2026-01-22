@@ -24,7 +24,7 @@ context:
 
 steps:
   - id: extract
-    agent: browser:browser-operator
+    agent: foundation:explorer
     prompt: |
       Extract dynamic content from {{url}}
       

@@ -16,7 +16,7 @@ context:
 
 steps:
   - id: capture
-    agent: browser:visual-documenter
+    agent: foundation:explorer
     prompt: |
       Perform a visual audit of {{base_url}}
       

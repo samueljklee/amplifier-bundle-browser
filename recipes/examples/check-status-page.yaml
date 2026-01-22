@@ -22,7 +22,7 @@ context:
 
 steps:
   - id: check-status
-    agent: browser:browser-operator
+    agent: foundation:explorer
     prompt: |
       Check the status page at {{status_url}} for any incidents or issues.
       
