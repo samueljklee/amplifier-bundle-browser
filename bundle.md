@@ -1,8 +1,8 @@
 ---
 bundle:
   name: browser
-  version: 0.1.0
-  description: Browser automation capabilities via agent-browser CLI
+  version: 0.2.0
+  description: Browser automation for AI agents - JS rendering, auth flows, visual verification
 
 # Include foundation for bash tool, then our behavior for the agent
 includes:
