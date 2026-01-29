@@ -119,6 +119,208 @@ document
 4. **Close when done** - Clean up browser resources
 5. **Handle errors gracefully** - Check if elements exist before interacting
 
+---
+
+## UX Testing Mindset
+
+When performing UX testing or validation, act like a real user, not a test script.
+
+### Act Like a User
+
+- **Scroll down** to see all content, not just what's above the fold
+- **Explore** the UI - click on things to understand state
+- **Read** what's on screen and describe it to the user
+- **Notice** details a user would notice (loading states, transitions, errors)
+
+### Don't Be a Robot
+
+- Don't just execute the minimum clicks to complete a task
+- Don't take screenshots reflexively (only when useful or requested)
+- Don't poll silently - communicate what you're waiting for
+
+### Async Operations
+
+When an operation takes time (AI generation, file processing, API calls):
+
+1. **Identify the progress indicator** in the snapshot (spinner, status text, progress bar)
+2. **Communicate** what you see: "Status shows 'Creating file...'"
+3. **Poll with backoff**: 5s → 10s → 15s (not linear escalation)
+4. **Ask if stuck**: After 2-3 unchanged polls, ask the user what they see
+
+### Headed Mode Collaboration
+
+When user can see the browser (`--headed`):
+
+- Confirm: "I've opened a browser window - you should see it on your screen"
+- They may see completion before you detect it
+- Ask them: "Can you see the browser? What does it show?"
+- Trust their observations - they have visual context you lack
+
+### Screenshots: Be Strategic
+
+**Don't screenshot by default.** Only capture when:
+- User explicitly requested screenshots
+- You need to document unexpected behavior or a bug
+- Creating before/after evidence for a specific change
+
+Skip screenshots when:
+- User is watching `--headed` mode (they can see it)
+- During polling (same state captured repeatedly)
+- For routine verification (snapshot text is sufficient)
+
+---
+
+## SPA/JavaScript Framework Patterns
+
+Modern web apps (React, Vue, Angular, Svelte, Next.js, etc.) require special handling.
+
+### Detecting SPA vs Static Sites
+
+| Type | Signs | Action |
+|------|-------|--------|
+| **SPA** | Minimal initial HTML, `<div id="root">` or `<div id="app">` | Wait 2-3s before snapshot |
+| **Static** | Full content visible immediately | Snapshot immediately |
+
+### SPA Workflow (Critical)
+
+```bash
+agent-browser open "http://localhost:5173"
+sleep 2                        # REQUIRED: Wait for JS hydration
+agent-browser snapshot -ic     # NOW refs are stable
+```
+
+**Why**: SPAs render content via JavaScript. Initial HTML is often just an empty container. Without waiting, your snapshot captures nothing useful.
+
+### State Change Detection
+
+SPAs update UI dynamically. Detect changes with before/after snapshots:
+
+```bash
+# 1. Capture before state
+agent-browser snapshot -ic
+
+# 2. Trigger action
+agent-browser click @e5
+
+# 3. Wait for state update
+sleep 0.5
+
+# 4. Capture after state - new elements have new refs
+agent-browser snapshot -ic
+```
+
+**What changes**:
+- New elements (toasts, modals) get new refs (@e6, @e7...)
+- Removed elements' refs become invalid
+- Existing elements' refs stay stable
+
+### Transient UI (Toasts, Modals, Dropdowns)
+
+These appear briefly then auto-dismiss. Capture quickly:
+
+```bash
+# Toast notifications
+agent-browser click @e5          # Triggers toast
+sleep 0.3                        # Brief pause (not too long!)
+agent-browser snapshot -ic       # Capture before auto-dismiss
+
+# Modals
+agent-browser click @e3          # Open modal button
+sleep 0.5
+agent-browser snapshot -ic       # Modal elements now visible
+agent-browser click @e10         # Close button (or press Escape)
+
+# Dropdowns
+agent-browser click @e5          # Dropdown trigger
+sleep 0.3
+agent-browser snapshot -ic       # Menu items visible
+agent-browser click @e8          # Select option
+```
+
+### API-Dependent Content
+
+SPAs often fetch data from APIs. Content may load progressively:
+
+```bash
+agent-browser open "http://localhost:3000/dashboard"
+sleep 2                        # Initial hydration
+agent-browser snapshot -ic     # May show: "Loading...", skeletons
+
+sleep 3                        # Wait for API responses
+agent-browser snapshot -ic     # Now shows actual data
+```
+
+**Signs of incomplete loading**: Skeleton loaders, "Loading..." text, spinners, empty lists
+
+### Client-Side Routing
+
+SPAs handle navigation without full page reloads:
+
+```bash
+agent-browser click @e4          # Click nav link
+sleep 0.5                        # Route transition
+agent-browser snapshot -ic       # New view renders
+agent-browser get url            # URL changed client-side
+```
+
+---
+
+## Testing Patterns
+
+When performing QA or validation tasks, use these patterns.
+
+### Assertion-Style Validation
+
+```bash
+# Verify element exists and is visible
+agent-browser is visible @e3     # Returns true/false
+
+# Verify element state
+agent-browser is enabled @e5     # Is button clickable?
+agent-browser is checked @e8     # Is checkbox checked?
+
+# Verify text content
+agent-browser get text @e3       # Compare with expected value
+```
+
+### Form Validation Testing
+
+```bash
+# 1. Submit empty form (trigger validation)
+agent-browser click @e10         # Submit button
+sleep 0.5
+agent-browser snapshot -ic       # Validation errors should appear
+
+# 2. Fill required fields
+agent-browser fill @e3 "test@example.com"
+agent-browser fill @e5 "password123"
+
+# 3. Submit again
+agent-browser click @e10
+sleep 1
+agent-browser snapshot -ic       # Check for success or error
+```
+
+### Error Detection
+
+Look for error indicators in the accessibility tree:
+- **Alert role elements** - Error banners
+- **Text containing**: "error", "failed", "invalid", "required"
+- **Toast notifications** - API failures
+- **Disabled buttons** - Form validation failing
+
+### Test Report Format
+
+When completing QA tasks, structure your report:
+
+| Test Case | Status | Notes |
+|-----------|--------|-------|
+| Page loads | ✅ PASS | Title verified |
+| Form validation | ✅ PASS | Errors shown |
+| Submit success | ❌ FAIL | API timeout |
+
+---
+
 ## Output Format
 
 When completing a task, provide:
